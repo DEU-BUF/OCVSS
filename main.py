@@ -9,7 +9,7 @@ import os
 
 verbose = True
 cameraOut = False
-screenCapture = True
+screenCapture = False
 
 mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
 scrCapt = mss()
@@ -52,7 +52,7 @@ try:
             break
         #cv2.putText(frame, 'TEST', (width - 320, height - 120), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0))
         if cameraOut:
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # this line corrects the color coding
+            frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)  # this line corrects the color coding
             cam.send(frame)
         else:
             cv2.imshow('frame', np.array(frame))
