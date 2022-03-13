@@ -1,11 +1,18 @@
 import pyvirtualcam
+from mss import mss
+import numpy as np
 import cv2
+
 import platform
-import os
 import time
+import os
 
 verbose = True
-cameraOut = True
+cameraOut = False
+screenCapture = True
+
+mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
+scrCapt = mss()
 
 # capture = cv2.VideoCapture('http://192.168.5.90:8080/video')
 capture = cv2.VideoCapture('./sample_video.mp4')
@@ -32,27 +39,35 @@ if cameraOut:
 else:
     cv2.namedWindow("frame", cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
 
+# Main loop
 try:
     while True:
-        retVal, frame = capture.read()
+        if screenCapture:
+            frame = scrCapt.grab(mon)
+            retVal = (frame != None)
+        else:
+            retVal, frame = capture.read()
+
         if (cv2.waitKey(1) & 0xFF == ord('q')) or not retVal:
             break
-        cv2.putText(frame, 'TEST', (width - 320, height - 120), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0))
+        #cv2.putText(frame, 'TEST', (width - 320, height - 120), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0))
         if cameraOut:
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # this line corrects the color coding
             cam.send(frame)
         else:
-            cv2.imshow('frame', frame)
+            cv2.imshow('frame', np.array(frame))
 except KeyboardInterrupt:
     pass
 
-cam.close()
-capture.release()
+# Exiting
 cv2.destroyAllWindows()
-
-if platform.system() == "Linux":
-    retVal = -1
-    while retVal != 0:
-        if retVal != -1:
-            time.sleep(1)
-        retVal = os.system("sudo modprobe -r v4l2loopback")
+scrCapt.close()
+capture.release()
+if cameraOut:
+    cam.close()
+    if platform.system() == "Linux":
+        retVal = -1
+        while retVal != 0:
+            if retVal != -1:
+                time.sleep(1)
+            retVal = os.system("sudo modprobe -r v4l2loopback")
