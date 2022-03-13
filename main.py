@@ -5,7 +5,7 @@ import cv2
 verbose = True
 
 # capture = cv2.VideoCapture('http://192.168.43.251:8080/video')
-capture = cv2.VideoCapture('./2018510062_Uygar_Uygun_LAB3_Video.mp4')
+capture = cv2.VideoCapture('./sample_video.mp4')
 
 width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))  # float `width`
 height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))  # float `height`
