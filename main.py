@@ -15,15 +15,12 @@ frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))  # float `frame count`
 if verbose:
     print('Size: ', width, 'x', height, '\nFPS: ', fps, '\nTotal Frames: ', frame_count, sep='')
 
-print(os.environ["DISPLAY"])
 
-disp = Display(backend="xvfb", size=(width, height))
-# disp = Display(backend="xephyr", size=(width, height))
+# disp = Display(backend="xvfb", size=(width, height))
+disp = Display(backend="xephyr", size=(width, height))
 # disp = Display(backend="xvnc", size=(width, height))
 
 disp.start()
-os.environ["DISPLAY"] = ':0'
-print(os.environ["DISPLAY"])
 
 cv2.namedWindow("frame", cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
 while True:
