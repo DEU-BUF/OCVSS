@@ -55,19 +55,22 @@ class MainWindow(QMainWindow):
 			self.log.append("---")
 		self.log.append(QMediaDevices.defaultVideoInput().description())
 
-		captureSession = QMediaCaptureSession()
-		ig = QImageCapture
-		camera = QCamera()
-		captureSession.setCamera(camera)
-		captureSession.setImageCapture(ig)
+		# TEST AREA
+		# captureSession = QMediaCaptureSession()
+		# ig = QImageCapture
+		# camera = QCamera()
+		# captureSession.setCamera(camera)
+		# captureSession.setImageCapture(ig)
 
 		# viewfinder = QVideoWidget()
 		# captureSession.setVideoOutput(viewfinder)
 		#
 		# self.gridLayout.addWidget(viewfinder, 4, 0, 1, 1)
 		# viewfinder.show()
-		camera.start()
-		ig.captureToFile("test.png")
+
+		# camera.start()
+		# ig.captureToFile("test.png")
+		# TEST AREA
 
 		self.setCentralWidget(self.centralWidget)
 
