@@ -1,11 +1,10 @@
 import sys
-from PySide6.QtCore import QSize, QMetaObject, QCoreApplication, QUrl, QFile
-from PySide6.QtGui import Qt
-from PySide6.QtMultimedia import QMediaDevices, QMediaCaptureSession, QCamera, QMediaPlayer, QImageCapture
-from PySide6.QtMultimediaWidgets import QVideoWidget
-from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, QFrame, QApplication, QMainWindow, \
-	QTextEdit
-from PySide6 import __version__
+from PySide2.QtCore import QSize, QMetaObject, QCoreApplication, QUrl, QFile
+from PySide2.QtGui import Qt
+from PySide2.QtMultimedia import QCamera, QMediaPlayer, QCameraInfo
+from PySide2.QtMultimediaWidgets import QVideoWidget
+from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, QFrame, QApplication, QMainWindow
+from PySide2 import __version__
 
 
 class MainWindow(QMainWindow):
@@ -45,31 +44,31 @@ class MainWindow(QMainWindow):
 		self.label.setAlignment(Qt.AlignCenter)
 		self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
 
-		self.log = QTextEdit(self.centralWidget)
-		self.gridLayout.addWidget(self.log, 3, 0, 1, 2)
+		# self.log = QTextEdit(self.centralWidget)
+		# self.gridLayout.addWidget(self.log, 3, 0, 1, 2)
 
-		for dev in QMediaDevices.videoInputs():
-			self.log.append("ID: " + dev.id())
-			self.log.append("Description: " + dev.description())
-			self.log.append("Default: " + str(dev.isDefault()))
-			self.log.append("---")
-		self.log.append(QMediaDevices.defaultVideoInput().description())
+		# for dev in QMediaDevices.videoInputs():
+		# 	self.log.append("ID: " + dev.id())
+		# 	self.log.append("Description: " + dev.description())
+		# 	self.log.append("Default: " + str(dev.isDefault()))
+		# 	self.log.append("---")
+		# self.log.append(QMediaDevices.defaultVideoInput().description())
 
 		# TEST AREA
-		# captureSession = QMediaCaptureSession()
-		# ig = QImageCapture
-		# camera = QCamera()
-		# captureSession.setCamera(camera)
-		# captureSession.setImageCapture(ig)
 
-		# viewfinder = QVideoWidget()
-		# captureSession.setVideoOutput(viewfinder)
-		#
-		# self.gridLayout.addWidget(viewfinder, 4, 0, 1, 1)
-		# viewfinder.show()
+		for dev in QCameraInfo.availableCameras():
+		 	print(dev.description())
 
-		# camera.start()
-		# ig.captureToFile("test.png")
+		player = QMediaPlayer(self.centralWidget)
+		camera = QCamera(self.centralWidget)
+		viewfinder = QVideoWidget(self.centralWidget)
+
+		player.setVideoOutput(viewfinder)
+
+		self.gridLayout.addWidget(viewfinder, 4, 0, 1, 1)
+		viewfinder.show()
+
+		camera.start()
 		# TEST AREA
 
 		self.setCentralWidget(self.centralWidget)
@@ -98,4 +97,4 @@ if __name__ == "__main__":
 	widget.resize(800, 600)
 	widget.show()
 
-	sys.exit(app.exec())
+	sys.exit(app.exec_())
