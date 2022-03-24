@@ -8,8 +8,6 @@ class PreviewWidget(QWidget):
 		super().__init__(parent)
 		self.verbose = verbose
 
-		self.vprint("testtt")
-
 		self.layout = QGridLayout()
 		self.setLayout(self.layout)
 
