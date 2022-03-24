@@ -1,6 +1,6 @@
 from PySide2.QtGui import Qt, QImage, QPixmap
 from PySide2.QtWidgets import QWidget, QLabel, QSizePolicy, QFrame, QGridLayout, QPushButton
-from PySide2.QtCore import QSize, QThread, Signal, Slot
+from PySide2.QtCore import QSize, QThread, Signal
 import cv2
 from mss import mss
 from numpy import array as np_array

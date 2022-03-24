@@ -1,11 +1,7 @@
 import sys
 
-from PySide2.QtCore import QSize, QMetaObject, QCoreApplication, QUrl, QFile, QTimer, Slot, Signal, QThread
-from PySide2.QtGui import Qt, QPixmap, QImage
-from PySide2.QtMultimedia import QCamera, QMediaPlayer, QCameraInfo, QMediaPlaylist
-from PySide2.QtMultimediaWidgets import QVideoWidget, QCameraViewfinder
-from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, QFrame, QApplication, QMainWindow, \
-	QTextEdit, QVBoxLayout
+from PySide2.QtCore import QMetaObject, QCoreApplication
+from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, QMainWindow
 from PySide2 import __version__
 
 import Camera
@@ -37,8 +33,8 @@ class MainWindow(QMainWindow):
 
 		# TEST AREA START
 
-		for dev in QCameraInfo.availableCameras():
-			print(dev.description())
+		# for dev in QCameraInfo.availableCameras():
+		# 	print(dev.description())
 
 		self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 		self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
