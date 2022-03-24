@@ -7,6 +7,8 @@ from PySide6 import __version__
 import Camera
 import Screen
 
+verbose = True
+
 
 class MainWindow(QMainWindow):
 
@@ -20,13 +22,11 @@ class MainWindow(QMainWindow):
 		self.centralWidget = QWidget(self)
 		self.gridLayout = QGridLayout(self.centralWidget)
 
-
 		self.pushButton = QPushButton(self.centralWidget)
 		self.gridLayout.addWidget(self.pushButton, 2, 0, 1, 1)
 
 		self.pushButton_2 = QPushButton(self.centralWidget)
 		self.gridLayout.addWidget(self.pushButton_2, 2, 1, 1, 1)
-
 
 		# self.log = QTextEdit(self.centralWidget)
 		# self.gridLayout.addWidget(self.log, 3, 0, 1, 2)
@@ -36,10 +36,10 @@ class MainWindow(QMainWindow):
 		# for dev in QCameraInfo.availableCameras():
 		# 	print(dev.description())
 
-		self.cameraWidget = Camera.CameraWidget(self.centralWidget)
+		self.cameraWidget = Camera.CameraWidget(self.centralWidget, verbose)
 		self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
 
-		self.screenWidget = Screen.ScreenWidget(self.centralWidget)
+		self.screenWidget = Screen.ScreenWidget(self.centralWidget, verbose)
 		self.gridLayout.addWidget(self.screenWidget, 0, 1, 1, 1)
 
 		# TEST AREA END
@@ -50,8 +50,6 @@ class MainWindow(QMainWindow):
 
 		QMetaObject.connectSlotsByName(self)
 
-
-
 	def retranslateUi(self, Window):
 		Window.setWindowTitle(QCoreApplication.translate("MainWindow", "OCVSS", None))
 		self.pushButton.setText(QCoreApplication.translate("MainWindow", "Choose Camera Input", None))
@@ -59,9 +57,6 @@ class MainWindow(QMainWindow):
 		self.label_2.setText(QCoreApplication.translate("MainWindow",
 		                                                "<html><head/><body><p align=\"center\">LECTURE SCREEN</p></body></html>",
 		                                                None))
-
-
-
 
 
 if __name__ == "__main__":
@@ -72,4 +67,7 @@ if __name__ == "__main__":
 	widget.resize(800, 600)
 	widget.show()
 
-	sys.exit(app.exec_())
+	app.aboutToQuit.connect(widget.cameraWidget.stopPreviewFeed)
+	app.aboutToQuit.connect(widget.screenWidget.stopPreviewFeed)
+
+	sys.exit(app.exec())
