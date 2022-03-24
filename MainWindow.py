@@ -1,13 +1,22 @@
 import sys
-from PySide2.QtCore import QSize, QMetaObject, QCoreApplication, QUrl, QFile
-from PySide2.QtGui import Qt
-from PySide2.QtMultimedia import QCamera, QMediaPlayer, QCameraInfo
-from PySide2.QtMultimediaWidgets import QVideoWidget
-from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, QFrame, QApplication, QMainWindow
+
+from PySide2.QtCore import QSize, QMetaObject, QCoreApplication, QUrl, QFile, QTimer, Slot, Signal, QThread
+from PySide2.QtGui import Qt, QPixmap, QImage
+from PySide2.QtMultimedia import QCamera, QMediaPlayer, QCameraInfo, QMediaPlaylist
+from PySide2.QtMultimediaWidgets import QVideoWidget, QCameraViewfinder
+from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, QFrame, QApplication, QMainWindow, \
+	QTextEdit, QVBoxLayout
 from PySide2 import __version__
+
+import Camera
+import Screen
 
 
 class MainWindow(QMainWindow):
+
+	def showCam(self):
+		print("Active state:", self.camera.status())
+
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.resize(1120, 449)
@@ -15,67 +24,37 @@ class MainWindow(QMainWindow):
 		self.centralWidget = QWidget(self)
 		self.gridLayout = QGridLayout(self.centralWidget)
 
+
 		self.pushButton = QPushButton(self.centralWidget)
 		self.gridLayout.addWidget(self.pushButton, 2, 0, 1, 1)
 
 		self.pushButton_2 = QPushButton(self.centralWidget)
 		self.gridLayout.addWidget(self.pushButton_2, 2, 1, 1, 1)
 
-		self.label_2 = QLabel(self.centralWidget)
-		sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-		sizePolicy.setHorizontalStretch(0)
-		sizePolicy.setVerticalStretch(0)
-		sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-		self.label_2.setSizePolicy(sizePolicy)
-		self.label_2.setMinimumSize(QSize(533, 300))
-		self.label_2.setFrameShape(QFrame.Box)
-		self.label_2.setFrameShadow(QFrame.Raised)
-		self.label_2.setLineWidth(3)
-		self.label_2.setAlignment(Qt.AlignCenter)
-		self.gridLayout.addWidget(self.label_2, 0, 1, 1, 1)
-
-		self.label = QLabel(self.centralWidget)
-		sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-		self.label.setSizePolicy(sizePolicy)
-		self.label.setMinimumSize(QSize(533, 300))
-		self.label.setFrameShape(QFrame.Box)
-		self.label.setFrameShadow(QFrame.Raised)
-		self.label.setLineWidth(3)
-		self.label.setAlignment(Qt.AlignCenter)
-		self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
 
 		# self.log = QTextEdit(self.centralWidget)
 		# self.gridLayout.addWidget(self.log, 3, 0, 1, 2)
 
-		# for dev in QMediaDevices.videoInputs():
-		# 	self.log.append("ID: " + dev.id())
-		# 	self.log.append("Description: " + dev.description())
-		# 	self.log.append("Default: " + str(dev.isDefault()))
-		# 	self.log.append("---")
-		# self.log.append(QMediaDevices.defaultVideoInput().description())
-
-		# TEST AREA
+		# TEST AREA START
 
 		for dev in QCameraInfo.availableCameras():
-		 	print(dev.description())
+			print(dev.description())
 
-		player = QMediaPlayer(self.centralWidget)
-		camera = QCamera(self.centralWidget)
-		viewfinder = QVideoWidget(self.centralWidget)
+		self.cameraWidget = Camera.CameraWidget(self.centralWidget)
+		self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
 
-		player.setVideoOutput(viewfinder)
+		self.screenWidget = Screen.ScreenWidget(self.centralWidget)
+		self.gridLayout.addWidget(self.screenWidget, 0, 1, 1, 1)
 
-		self.gridLayout.addWidget(viewfinder, 4, 0, 1, 1)
-		viewfinder.show()
-
-		camera.start()
-		# TEST AREA
+		# TEST AREA END
 
 		self.setCentralWidget(self.centralWidget)
 
-		self.retranslateUi(self)
+		# self.retranslateUi(self)
 
 		QMetaObject.connectSlotsByName(self)
+
+
 
 	def retranslateUi(self, Window):
 		Window.setWindowTitle(QCoreApplication.translate("MainWindow", "OCVSS", None))
@@ -84,14 +63,14 @@ class MainWindow(QMainWindow):
 		self.label_2.setText(QCoreApplication.translate("MainWindow",
 		                                                "<html><head/><body><p align=\"center\">LECTURE SCREEN</p></body></html>",
 		                                                None))
-		self.label.setText(QCoreApplication.translate("MainWindow",
-		                                              "<html><head/><body><p align=\"center\">CAMERA INPUT</p></body></html>",
-		                                              None))
+
+
+
 
 
 if __name__ == "__main__":
-	print(__version__.__str__())
-	app = QApplication([])
+	print("Qt version:", __version__.__str__())
+	app = QApplication(sys.argv)
 
 	widget = MainWindow()
 	widget.resize(800, 600)
