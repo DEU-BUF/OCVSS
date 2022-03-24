@@ -1,6 +1,6 @@
-from PySide2.QtGui import Qt, QImage, QPixmap
-from PySide2.QtWidgets import QWidget, QLabel, QSizePolicy, QFrame, QGridLayout, QPushButton
-from PySide2.QtCore import QSize, QThread, Signal, Slot
+from PySide6.QtGui import Qt, QImage, QPixmap
+from PySide6.QtWidgets import QWidget, QLabel, QSizePolicy, QFrame, QGridLayout, QPushButton
+from PySide6.QtCore import QSize, QThread, Signal, Slot
 import cv2
 
 

@@ -1,8 +1,8 @@
 import sys
 
-from PySide2.QtCore import QMetaObject, QCoreApplication
-from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, QMainWindow
-from PySide2 import __version__
+from PySide6.QtCore import QMetaObject, QCoreApplication
+from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, QMainWindow
+from PySide6 import __version__
 
 import Camera
 import Screen
