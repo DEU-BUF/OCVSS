@@ -13,8 +13,8 @@ def vprint(*args, **kwargs):
 	print(*args, **kwargs)
 
 
-cameraOut = False
-screenCapture = False
+cameraOut = True
+screenCapture = True
 
 mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
 scrCapt = mss()  # Screen capturing utility
@@ -86,7 +86,7 @@ def cameraOutput():
 		else:
 			device = "OBS Virtual Camera"
 
-		return pyvirtualcam.Camera(width, height, fps, device=device)
+		return pyvirtualcam.Camera(1920, 1080, fps, device=device)
 	else:
 		cv2.namedWindow("frame", cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
 
