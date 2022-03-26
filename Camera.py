@@ -1,7 +1,7 @@
 import sys
 
 import cv2
-from cv2 import VideoCapture, flip, setLogLevel
+from cv2.cv2 import VideoCapture, flip, setLogLevel, videoio_registry
 from PySide6.QtMultimedia import QMediaDevices
 import Preview
 
@@ -33,12 +33,17 @@ class CameraWidget(Preview.PreviewWidget):
 					break
 
 		def source(self):
-			if sys.platform == "windows":
-				cap = VideoCapture(self.inputIndex)
+			if sys.platform == "win32":
+				cap = VideoCapture(self.inputIndex, cv2.CAP_DSHOW)
+				cap.set(cv2.CAP_PROP_FPS, 30.0)
+				cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280.0)
+				cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720.0)
+				#cap.set(cv2.CAP_PROP_FOURCC, )
 				print(cap.get(cv2.CAP_PROP_FPS))
 				print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 				print(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 				print(cap.get(cv2.CAP_PROP_FOURCC))
+				print(cap.get(cv2.CAP_PROP_BACKEND))
 				return cap
 			elif sys.platform == "linux":
 				cap = VideoCapture(self.inputIndex, cv2.CAP_GSTREAMER)#, cv2.CAP_V4L2)

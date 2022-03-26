@@ -23,7 +23,7 @@ width = height = fps = frame_count = 0
 
 def main():
 	# capture = cv2.VideoCapture('http://192.168.5.90:8080/video')
-	capture = cv2.VideoCapture(0)
+	capture = cv2.VideoCapture("sample_video.mp4")
 
 	getInputProperties(capture)
 	cam = cameraOutput()
