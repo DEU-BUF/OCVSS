@@ -1,8 +1,8 @@
 import sys
 
 from cv2 import VideoCapture, flip, setLogLevel, VideoWriter_fourcc
-from cv2 import CAP_V4L2, CAP_DSHOW, CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC
-from PySide6.QtMultimedia import QMediaDevices
+	from cv2 import CAP_V4L2, CAP_DSHOW, CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC, CAP_PROP_BACKEND
+from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
 
 KNOWN_FOURCC_VALUES = {"YUYV": 1448695129, "MJPG": 1196444237, "YU12": 1498755378}
@@ -49,7 +49,8 @@ class CameraWidget(Preview.PreviewWidget):
 
 		def source(self):
 			if sys.platform == "win32":
-				cap = VideoCapture(self.inputIndex, CAP_DSHOW)
+				cap = VideoCapture(self.inputIndex)
+				print(cap.get(CAP_PROP_BACKEND))
 				self.setMaxBitrate(cap)
 				return cap
 			elif sys.platform == "linux":
@@ -59,7 +60,9 @@ class CameraWidget(Preview.PreviewWidget):
 				return cap
 
 		def setMaxBitrate(self, source):
+			print(KNOWN_FOURCC_VALUES)
 			for prop in self.cameraFormats:
+				print(prop)
 				source.set(CAP_PROP_FPS, prop["fps"])
 				source.set(CAP_PROP_FRAME_WIDTH, prop["width"])
 				source.set(CAP_PROP_FRAME_HEIGHT, prop["height"])
@@ -67,9 +70,25 @@ class CameraWidget(Preview.PreviewWidget):
 
 				# Wait for a frame to come
 				ret, _ = source.read()
+				print(ret)
 				# If the just tried values are set correctly
+				print(source.get(CAP_PROP_FRAME_WIDTH))
+				print(source.get(CAP_PROP_FRAME_HEIGHT))
+				print(source.get(CAP_PROP_FPS))
+				print("******")
+				print(source.get(CAP_PROP_FOURCC))
+				print(self.decode_fourcc(source.get(CAP_PROP_FOURCC)))
+				vff = QVideoFrameFormat
+				print(vars(vff).items())
+				print(QVideoFrameFormat.PixelFormat(int(source.get(CAP_PROP_FOURCC))))
+				# print(QVideoFrameFormat.pixelFormatToString(source.get(CAP_PROP_FOURCC)))
+				break
 				if ret and source.get(CAP_PROP_FRAME_WIDTH) == prop["width"] and source.get(CAP_PROP_FRAME_HEIGHT) == prop["height"] and source.get(CAP_PROP_FPS) == prop["fps"] and source.get(CAP_PROP_FOURCC) == prop["fourcc"]:
 					break
+
+		def decode_fourcc(self, v):
+			v = int(v)
+			return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
 
 		def getFrame(self, source):
 			return source.read()
