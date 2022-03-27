@@ -1,7 +1,7 @@
 import sys
 
 from cv2 import VideoCapture, flip, setLogLevel, VideoWriter_fourcc
-	from cv2 import CAP_V4L2, CAP_DSHOW, CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC, CAP_PROP_BACKEND
+from cv2 import CAP_V4L2, CAP_DSHOW, CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC, CAP_PROP_BACKEND
 from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
 
@@ -76,13 +76,8 @@ class CameraWidget(Preview.PreviewWidget):
 				print(source.get(CAP_PROP_FRAME_HEIGHT))
 				print(source.get(CAP_PROP_FPS))
 				print("******")
-				print(source.get(CAP_PROP_FOURCC))
 				print(self.decode_fourcc(source.get(CAP_PROP_FOURCC)))
-				vff = QVideoFrameFormat
-				print(vars(vff).items())
-				print(QVideoFrameFormat.PixelFormat(int(source.get(CAP_PROP_FOURCC))))
-				# print(QVideoFrameFormat.pixelFormatToString(source.get(CAP_PROP_FOURCC)))
-				break
+				print("******")
 				if ret and source.get(CAP_PROP_FRAME_WIDTH) == prop["width"] and source.get(CAP_PROP_FRAME_HEIGHT) == prop["height"] and source.get(CAP_PROP_FPS) == prop["fps"] and source.get(CAP_PROP_FOURCC) == prop["fourcc"]:
 					break
 
