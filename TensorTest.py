@@ -9,11 +9,12 @@ from matplotlib.collections import LineCollection
 import matplotlib.patches as patches
 
 import imageio
+from IPython.display import HTML, display
 
 
 def main():
 	model_name = "movenet_lightning"
-
+	print("Test successful")
 	# if "tflite" in model_name:
 	# 	if "movenet_lightning_f16" in model_name:
 	# 		!wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/float16/4?lite-format=tflite
