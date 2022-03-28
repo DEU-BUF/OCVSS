@@ -6,6 +6,7 @@ from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
 
 KNOWN_FOURCC_VALUES = {"YUYV": 1448695129, "MJPG": 1196444237, "YU12": 1498755378}
+LIVE_FEED = False #enables live feed from camera, false value will make the code use the sample_video as an input
 
 
 class CameraWidget(Preview.PreviewWidget):
@@ -23,12 +24,14 @@ class CameraWidget(Preview.PreviewWidget):
 
 			# Selecting first working camera
 			for i in range(10):
+				print(i)
 				if self.testCamera(i):
 					self.inputIndex = i
 					break
 
 			# Getting all video resolution x fps x fourccVal combos to brute force later
 			for dev in QMediaDevices.videoInputs():
+				print('description: ' + dev.description())
 				for vidForm in dev.videoFormats():
 					fps = vidForm.maxFrameRate()
 					if fps < 23:
@@ -49,20 +52,29 @@ class CameraWidget(Preview.PreviewWidget):
 
 		def source(self):
 			if sys.platform == "win32":
-				cap = VideoCapture(self.inputIndex)
+				# cap = VideoCapture(self.inputIndex, CAP_DSHOW)
+				if LIVE_FEED:
+					cap = VideoCapture(self.inputIndex)
+					cap.read()
+					self.setMaxBitrate(cap)
+				else:
+					cap = VideoCapture('sample_video.mp4')
 				print(cap.get(CAP_PROP_BACKEND))
-				self.setMaxBitrate(cap)
 				return cap
+
 			elif sys.platform == "linux":
-				cap = VideoCapture(self.inputIndex, CAP_V4L2)
-				# cap.read() # WAIT UNTIL CAMERA IS READY
-				self.setMaxBitrate(cap)
+				if LIVE_FEED:
+					cap = VideoCapture(self.inputIndex, CAP_V4L2)
+					cap.read() # WAIT UNTIL CAMERA IS READY
+					self.setMaxBitrate(cap)
+				else:
+					cap = VideoCapture("sample_video.mp4")
 				return cap
 
 		def setMaxBitrate(self, source):
 			print(KNOWN_FOURCC_VALUES)
 			for prop in self.cameraFormats:
-				print(prop)
+				print(prop + ' this is prop')
 				source.set(CAP_PROP_FPS, prop["fps"])
 				source.set(CAP_PROP_FRAME_WIDTH, prop["width"])
 				source.set(CAP_PROP_FRAME_HEIGHT, prop["height"])
@@ -76,9 +88,10 @@ class CameraWidget(Preview.PreviewWidget):
 				print(source.get(CAP_PROP_FRAME_HEIGHT))
 				print(source.get(CAP_PROP_FPS))
 				print("******")
-				print(self.decode_fourcc(source.get(CAP_PROP_FOURCC)))
+				print(source.get(CAP_PROP_FOURCC))
 				print("******")
 				if ret and source.get(CAP_PROP_FRAME_WIDTH) == prop["width"] and source.get(CAP_PROP_FRAME_HEIGHT) == prop["height"] and source.get(CAP_PROP_FPS) == prop["fps"] and source.get(CAP_PROP_FOURCC) == prop["fourcc"]:
+					print('The camera has been set properly')
 					break
 
 		def decode_fourcc(self, v):
