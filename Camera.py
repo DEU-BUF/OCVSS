@@ -6,7 +6,7 @@ from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
 
 KNOWN_FOURCC_VALUES = {"YUYV": 1448695129, "MJPG": 1196444237, "YU12": 1498755378}
-LIVE_FEED = False #enables live feed from camera, false value will make the code use the sample_video as an input
+LIVE_FEED = True #enables live feed from camera, false value will make the code use the sample_video as an input
 
 
 class CameraWidget(Preview.PreviewWidget):
@@ -24,7 +24,6 @@ class CameraWidget(Preview.PreviewWidget):
 
 			# Selecting first working camera
 			for i in range(10):
-				print(i)
 				if self.testCamera(i):
 					self.inputIndex = i
 					break
@@ -56,7 +55,7 @@ class CameraWidget(Preview.PreviewWidget):
 				if LIVE_FEED:
 					cap = VideoCapture(self.inputIndex)
 					cap.read()
-					self.setMaxBitrate(cap)
+					# self.setMaxBitrate(cap)
 				else:
 					cap = VideoCapture('sample_video.mp4')
 				print(cap.get(CAP_PROP_BACKEND))
@@ -74,7 +73,7 @@ class CameraWidget(Preview.PreviewWidget):
 		def setMaxBitrate(self, source):
 			print(KNOWN_FOURCC_VALUES)
 			for prop in self.cameraFormats:
-				print(prop + ' this is prop')
+				print(prop, ' this is prop')
 				source.set(CAP_PROP_FPS, prop["fps"])
 				source.set(CAP_PROP_FRAME_WIDTH, prop["width"])
 				source.set(CAP_PROP_FRAME_HEIGHT, prop["height"])
