@@ -11,7 +11,7 @@ import VideoInput
 import Screen
 
 verbose = True
-CameraInput = False
+CameraInput = True
 
 class MainWindow(QMainWindow):
 	def __init__(self, parent=None):

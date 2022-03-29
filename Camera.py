@@ -6,7 +6,6 @@ from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
 
 KNOWN_FOURCC_VALUES = {"YUYV": 1448695129, "MJPG": 1196444237, "YU12": 1498755378}
-LIVE_FEED = False  # Enables live feed from camera, false value will make the code use the sample_video as an input
 
 
 class CameraWidget(Preview.PreviewWidget):
@@ -52,22 +51,16 @@ class CameraWidget(Preview.PreviewWidget):
 		def source(self):
 			if sys.platform == "win32":
 				# cap = VideoCapture(self.inputIndex, CAP_DSHOW)
-				if LIVE_FEED:
-					cap = VideoCapture(self.inputIndex)
-					cap.read()
-					# self.setMaxBitrate(cap)
-				else:
-					cap = VideoCapture('sample_video.mp4')
+				cap = VideoCapture(self.inputIndex)
+				cap.read()
+				# self.setMaxBitrate(cap)
 				print(cap.get(CAP_PROP_BACKEND))
 				return cap
 
 			elif sys.platform == "linux":
-				if LIVE_FEED:
-					cap = VideoCapture(self.inputIndex, CAP_V4L2)
-					cap.read() # WAIT UNTIL CAMERA IS READY
-					self.setMaxBitrate(cap)
-				else:
-					cap = VideoCapture("sample_video.mp4")
+				cap = VideoCapture(self.inputIndex, CAP_V4L2)
+				cap.read() # WAIT UNTIL CAMERA IS READY
+				self.setMaxBitrate(cap)
 				return cap
 
 		def setMaxBitrate(self, source):
