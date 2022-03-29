@@ -30,7 +30,7 @@ class CameraWidget(Preview.PreviewWidget):
 
 			# Getting all video resolution x fps x fourccVal combos to brute force later
 			for dev in QMediaDevices.videoInputs():
-				print('description: ' + dev.description())
+				print("Camera:", dev.description())
 				for vidForm in dev.videoFormats():
 					fps = vidForm.maxFrameRate()
 					if fps < 23:
@@ -71,9 +71,9 @@ class CameraWidget(Preview.PreviewWidget):
 				return cap
 
 		def setMaxBitrate(self, source):
-			print(KNOWN_FOURCC_VALUES)
+			# print(KNOWN_FOURCC_VALUES)
 			for prop in self.cameraFormats:
-				print(prop, ' this is prop')
+				# print("PROP:", prop)
 				source.set(CAP_PROP_FPS, prop["fps"])
 				source.set(CAP_PROP_FRAME_WIDTH, prop["width"])
 				source.set(CAP_PROP_FRAME_HEIGHT, prop["height"])
@@ -81,16 +81,16 @@ class CameraWidget(Preview.PreviewWidget):
 
 				# Wait for a frame to come
 				ret, _ = source.read()
-				print(ret)
+				# print(ret)
 				# If the just tried values are set correctly
-				print(source.get(CAP_PROP_FRAME_WIDTH))
-				print(source.get(CAP_PROP_FRAME_HEIGHT))
-				print(source.get(CAP_PROP_FPS))
-				print("******")
-				print(source.get(CAP_PROP_FOURCC))
-				print("******")
+				# print(source.get(CAP_PROP_FRAME_WIDTH))
+				# print(source.get(CAP_PROP_FRAME_HEIGHT))
+				# print(source.get(CAP_PROP_FPS))
+				# print("******")
+				# print(source.get(CAP_PROP_FOURCC))
+				# print("******")
 				if ret and source.get(CAP_PROP_FRAME_WIDTH) == prop["width"] and source.get(CAP_PROP_FRAME_HEIGHT) == prop["height"] and source.get(CAP_PROP_FPS) == prop["fps"] and source.get(CAP_PROP_FOURCC) == prop["fourcc"]:
-					print('The camera has been set properly')
+					print("The camera has been set properly")
 					break
 
 		def decode_fourcc(self, v):

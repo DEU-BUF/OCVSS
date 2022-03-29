@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
 	print("Qt version:", __version__.__str__())
 	app = QApplication(sys.argv)
+	print("Style:", app.style().name())
 
 	widget = MainWindow()
 	widget.resize(800, 600)
