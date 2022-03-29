@@ -14,7 +14,7 @@ def vprint(*args, **kwargs):
 
 
 cameraOut = True
-screenCapture = True
+screenCapture = False
 
 mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
 scrCapt = mss()  # Screen capturing utility
@@ -69,6 +69,12 @@ def main():
 
 def getInputProperties(capture):
 	global width, height, fps, frame_count
+	if screenCapture:
+		width = mon["width"]
+		height = mon["height"]
+		fps = 60
+		frame_count = -1
+		return
 	width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))  # float `width`
 	height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))  # float `height`
 	fps = int(capture.get(cv2.CAP_PROP_FPS))  # float `fps`
@@ -86,7 +92,7 @@ def cameraOutput():
 		else:
 			device = "OBS Virtual Camera"
 
-		return pyvirtualcam.Camera(1920, 1080, fps, device=device)
+		return pyvirtualcam.Camera(width, height, fps, device=device)
 	else:
 		cv2.namedWindow("frame", cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
 
