@@ -7,10 +7,11 @@ from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, Q
 from PySide6 import __version__
 
 import Camera
+import VideoInput
 import Screen
 
 verbose = True
-
+CameraInput = False
 
 class MainWindow(QMainWindow):
 	def __init__(self, parent=None):
@@ -27,8 +28,12 @@ class MainWindow(QMainWindow):
 		self.gridLayout.addWidget(self.startBtn, 2, 1, 1, 1)
 
 		# Create camera and screen widgets and add to the layout
-		self.cameraWidget = Camera.CameraWidget(self.centralWidget)
-		self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
+		if CameraInput:
+			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
+			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
+		else:
+			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)
+			self.gridLayout.addWidget(self.videoInputWidget, 0, 0, 1, 1)
 
 		self.screenWidget = Screen.ScreenWidget(self.centralWidget)
 		self.gridLayout.addWidget(self.screenWidget, 0, 1, 1, 1)
@@ -59,7 +64,10 @@ if __name__ == "__main__":
 	widget.resize(800, 600)
 	widget.show()
 
-	app.aboutToQuit.connect(widget.cameraWidget.stopPreviewFeed)
+	if CameraInput:
+		app.aboutToQuit.connect(widget.cameraWidget.stopPreviewFeed)
+	else:
+		app.aboutToQuit.connect(widget.videoInputWidget.stopPreviewFeed)
 	app.aboutToQuit.connect(widget.screenWidget.stopPreviewFeed)
 
 	sys.exit(app.exec())

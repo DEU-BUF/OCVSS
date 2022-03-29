@@ -6,7 +6,7 @@ from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
 
 KNOWN_FOURCC_VALUES = {"YUYV": 1448695129, "MJPG": 1196444237, "YU12": 1498755378}
-LIVE_FEED = True #enables live feed from camera, false value will make the code use the sample_video as an input
+LIVE_FEED = False  # Enables live feed from camera, false value will make the code use the sample_video as an input
 
 
 class CameraWidget(Preview.PreviewWidget):
