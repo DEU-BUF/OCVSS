@@ -3,7 +3,7 @@ import sys
 from PySide6.QtCore import QMetaObject, QCoreApplication
 from PySide6.QtGui import QMovie, QPixmap, QImage
 from PySide6.QtMultimedia import QCameraDevice, QMediaDevices
-from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, QMainWindow, QLabel, QSizePolicy
+from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, QMainWindow, QLabel, QSizePolicy, QStyleFactory
 from PySide6 import __version__
 
 import Camera
@@ -48,7 +48,12 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
 	print("Qt version:", __version__.__str__())
 	app = QApplication(sys.argv)
-	print("Style:", app.style().name())
+
+	print("Available styles:")
+	styles = QStyleFactory.keys()
+	for s in styles:
+		print("   ", s)
+	print("\nSelected:", app.style().name())
 
 	widget = MainWindow()
 	widget.resize(800, 600)
