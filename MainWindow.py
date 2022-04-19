@@ -60,6 +60,7 @@ if __name__ == "__main__":
 	for s in styles:
 		print("   ", s)
 	print("\nSelected:", app.style().name())
+	app.setStyle('windowsvista')
 
 	widget = MainWindow()
 	widget.resize(800, 600)

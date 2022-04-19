@@ -22,7 +22,7 @@ input_size = 192
 
 def main():
 	if sys.platform == "win32":
-		capture = cv2.VideoCapture(0)
+		capture = cv2.VideoCapture(1)
 	elif sys.platform == "linux":
 		capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
@@ -51,6 +51,11 @@ def main():
 		interpreter.invoke()
 		# Get the model prediction.
 		keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
+		f = open("keypoints.txt", "w")
+		f.write(str(input_details[0]))
+		f.write("\n")
+		f.write(str(output_details[0]))
+		f.close()
 		return keypoints_with_scores
 
 	# Main loop
@@ -71,9 +76,7 @@ def main():
 				input_frame = tf.image.resize_with_pad(input_frame, input_size, input_size)
 
 				keypoints_with_scores = movenet(input_frame)
-				f = open("keypoints.txt", "w")
-				f.write(str(keypoints_with_scores))
-				f.close()
+
 
 				display_image = tf.expand_dims(frame, axis=0)
 				display_image = tf.cast(tf.image.resize_with_pad(
