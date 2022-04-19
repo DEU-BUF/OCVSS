@@ -71,6 +71,9 @@ def main():
 				input_frame = tf.image.resize_with_pad(input_frame, input_size, input_size)
 
 				keypoints_with_scores = movenet(input_frame)
+				f = open("keypoints.txt", "w")
+				f.write(str(keypoints_with_scores))
+				f.close()
 
 				display_image = tf.expand_dims(frame, axis=0)
 				display_image = tf.cast(tf.image.resize_with_pad(
