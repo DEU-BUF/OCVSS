@@ -5,6 +5,7 @@ import cv2
 import platform
 import time
 import os
+import sys
 
 from cv2 import CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC
 
@@ -20,7 +21,10 @@ input_size = 192
 
 
 def main():
-	capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
+	if sys.platform == "win32":
+		capture = cv2.VideoCapture(0)
+	elif sys.platform == "linux":
+		capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
 	capture.set(CAP_PROP_FPS, 30)
 	capture.set(CAP_PROP_FRAME_WIDTH, 1280)
