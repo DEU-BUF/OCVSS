@@ -6,55 +6,81 @@ import platform
 import time
 import os
 
+from cv2 import CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC
 
-# Verbose print
-def vprint(*args, **kwargs):
-	# pass
-	print(*args, **kwargs)
-
+import tensorflow as tf
+from TensorHelper import *
 
 cameraOut = False
-screenCapture = False
 
-mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
-scrCapt = mss()  # Screen capturing utility
 width = height = fps = frame_count = 0
+
+# tf
+input_size = 192
 
 
 def main():
-	# capture = cv2.VideoCapture('http://192.168.5.90:8080/video')
-	capture = cv2.VideoCapture(0)
+	capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
+
+	capture.set(CAP_PROP_FPS, 30)
+	capture.set(CAP_PROP_FRAME_WIDTH, 1280)
+	capture.set(CAP_PROP_FRAME_HEIGHT, 720)
+	capture.set(CAP_PROP_FOURCC, 1196444237)
+	capture.read()
 
 	getInputProperties(capture)
 	cam = cameraOutput()
 
-	vprint('Size: ', width, 'x', height, '\nFPS: ', fps, '\nTotal Frames: ', frame_count, sep='')
+	print('Size: ', width, 'x', height, '\nFPS: ', fps, '\nTotal Frames: ', frame_count, sep='')
+
+	# tf
+	interpreter = tf.lite.Interpreter(model_path="model.tflite")
+	interpreter.allocate_tensors()
+
+	def movenet(input_image):
+		# TF Lite format expects tensor type of uint8.
+		input_image = tf.cast(input_image, dtype=tf.uint8)
+		input_details = interpreter.get_input_details()
+		output_details = interpreter.get_output_details()
+		interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
+		# Invoke inference.
+		interpreter.invoke()
+		# Get the model prediction.
+		keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
+		return keypoints_with_scores
 
 	# Main loop
 	try:
 		while True:
-			if screenCapture:
-				frame = scrCapt.grab(mon)
-				retVal = (frame is not None)
-			else:
-				retVal, frame = capture.read()
+			retVal, frame = capture.read()
 
 			if (cv2.waitKey(1) & 0xFF == ord('q')) or not retVal:
 				break
-
-			# cv2.putText(frame, 'TEST', (width - 320, height - 120), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0))
 
 			if cameraOut:
 				frame = cv2.cvtColor(np_array(frame), cv2.COLOR_RGB2BGR)  # this line corrects the color coding
 				cam.send(frame)
 			else:
-				cv2.imshow('frame', np_array(frame))
+				frame = cv2.flip(frame, 1)
+
+				input_frame = tf.expand_dims(frame, axis=0)
+				input_frame = tf.image.resize_with_pad(input_frame, input_size, input_size)
+
+				keypoints_with_scores = movenet(input_frame)
+
+				display_image = tf.expand_dims(frame, axis=0)
+				display_image = tf.cast(tf.image.resize_with_pad(
+					display_image, 1280, 1280), dtype=tf.int32)
+				output_overlay = draw_prediction_on_image(
+					np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores)
+				cv2.imshow('frame', output_overlay)
+
+
 	except KeyboardInterrupt:
 		pass
 
 	# Exiting
 	cv2.destroyAllWindows()
-	scrCapt.close()
 	capture.release()
 	if cameraOut:
 		showPlaceholder(cam)
@@ -69,12 +95,6 @@ def main():
 
 def getInputProperties(capture):
 	global width, height, fps, frame_count
-	if screenCapture:
-		width = mon["width"]
-		height = mon["height"]
-		fps = 60
-		frame_count = -1
-		return
 	width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))  # float `width`
 	height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))  # float `height`
 	fps = int(capture.get(cv2.CAP_PROP_FPS))  # float `fps`

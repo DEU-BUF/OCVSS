@@ -66,7 +66,7 @@ class CameraWidget(Preview.PreviewWidget):
 		def setMaxBitrate(self, source):
 			# print(KNOWN_FOURCC_VALUES)
 			for prop in self.cameraFormats:
-				# print("PROP:", prop)
+				print("PROP:", prop)
 				source.set(CAP_PROP_FPS, prop["fps"])
 				source.set(CAP_PROP_FRAME_WIDTH, prop["width"])
 				source.set(CAP_PROP_FRAME_HEIGHT, prop["height"])

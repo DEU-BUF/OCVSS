@@ -1,7 +1,4 @@
-import sys
-
-from cv2 import VideoCapture, flip, setLogLevel, VideoWriter_fourcc
-from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
+from cv2 import VideoCapture
 import Preview
 
 KNOWN_FOURCC_VALUES = {"YUYV": 1448695129, "MJPG": 1196444237, "YU12": 1498755378}
@@ -19,7 +16,7 @@ class VideoInputWidget(Preview.PreviewWidget):
 			super().__init__(parent, previewSize)
 
 		def source(self):
-			return VideoCapture("sample_video.mp4")
+			return VideoCapture("media/sample_video.mp4")
 
 		def getFrame(self, source):
 			return source.read()

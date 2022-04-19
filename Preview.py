@@ -59,7 +59,7 @@ class PreviewWidget(QWidget):
 		self.startPreviewFeed()
 
 	def loading(self):
-		loadingGIF = QMovie("loading.gif")
+		loadingGIF = QMovie("media/loading.gif")
 		self.previewView.setMovie(loadingGIF)
 		loadingGIF.start()
 
