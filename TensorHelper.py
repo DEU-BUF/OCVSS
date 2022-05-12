@@ -48,7 +48,7 @@ KEYPOINT_EDGE_INDS_TO_COLOR = {
 def _keypoints_and_edges_for_display(keypoints_with_scores,
                                      height,
                                      width,
-                                     keypoint_threshold=0.11):
+                                     keypoint_threshold=0.15):
 	"""Returns high confidence keypoints and edges for visualization.
 
 	Args:

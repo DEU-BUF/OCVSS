@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QApplication, Q
 from PySide6 import __version__
 
 import Camera
+import MovenetWidget
 import VideoInput
 import Screen
 
@@ -28,16 +29,25 @@ class MainWindow(QMainWindow):
 		self.startBtn = QPushButton(self.centralWidget)
 		self.gridLayout.addWidget(self.startBtn, 2, 1, 1, 1)
 
+		# Preview widgets
+		self.screenWidget = Screen.ScreenWidget(self.centralWidget)
+		self.gridLayout.addWidget(self.screenWidget, 0, 1, 1, 1)
+
+		self.gridLayout.addWidget(QLabel("<- MOVENET PREVIEW"), 1, 1, 1, 1)
+
+		self.movenetWidget = MovenetWidget.MovenetWidget(self.centralWidget)
+		self.gridLayout.addWidget(self.movenetWidget, 1, 0, 1, 1)
+
 		# Create camera and screen widgets and add to the layout
 		if CameraInput:
 			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
+			self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.incomingFrame)
+
 		else:
 			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.videoInputWidget, 0, 0, 1, 1)
-
-		self.screenWidget = Screen.ScreenWidget(self.centralWidget)
-		self.gridLayout.addWidget(self.screenWidget, 0, 1, 1, 1)
+			self.videoInputWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.incomingFrame)
 
 		self.setCentralWidget(self.centralWidget)
 
@@ -59,7 +69,7 @@ if __name__ == "__main__":
 	styles = QStyleFactory.keys()
 	for s in styles:
 		print("   ", s)
-	print("\nSelected:", app.style().name())
+	print("Selected:", app.style().name())
 	app.setStyle('windowsvista')
 
 	widget = MainWindow()
@@ -70,6 +80,8 @@ if __name__ == "__main__":
 		app.aboutToQuit.connect(widget.cameraWidget.stopPreviewFeed)
 	else:
 		app.aboutToQuit.connect(widget.videoInputWidget.stopPreviewFeed)
+
 	app.aboutToQuit.connect(widget.screenWidget.stopPreviewFeed)
+	app.aboutToQuit.connect(widget.movenetWidget.stopPreviewFeed)
 
 	sys.exit(app.exec())
