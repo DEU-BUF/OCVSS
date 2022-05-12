@@ -42,12 +42,12 @@ class MainWindow(QMainWindow):
 		if CameraInput:
 			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
-			self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.incomingFrame)
+			self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot)
 
 		else:
 			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.videoInputWidget, 0, 0, 1, 1)
-			self.videoInputWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.incomingFrame)
+			self.videoInputWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot)
 
 		self.setCentralWidget(self.centralWidget)
 

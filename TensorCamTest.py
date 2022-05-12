@@ -72,6 +72,7 @@ def main():
 			else:
 				frame = cv2.flip(frame, 1)
 
+				# frame is <class 'numpy.ndarray'>
 				input_frame = tf.expand_dims(frame, axis=0)
 				input_frame = tf.image.resize_with_pad(input_frame, input_size, input_size)
 
@@ -83,6 +84,8 @@ def main():
 					display_image, 1280, 1280), dtype=tf.int32)
 				output_overlay = draw_prediction_on_image(
 					np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores)
+
+				# output_overlay is <class 'numpy.ndarray'>
 				cv2.imshow('frame', output_overlay)
 
 

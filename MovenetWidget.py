@@ -21,7 +21,7 @@ class MovenetWidget(Preview.PreviewWidget):
 		def run(self):
 			self.ThreadActive = True
 
-		def incomingFrame(self, frame):
+		def updateFrameSlot(self, frame):
 			self.movenet_frame = (self.movenet_frame + 1) % 10
 			if self.movenet_frame == 0:
 				# TODO PROCESS HERE

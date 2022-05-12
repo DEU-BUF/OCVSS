@@ -1,3 +1,4 @@
+import numpy as np
 from PySide6.QtCore import QMetaObject, QCoreApplication, QThread, Signal, QSize
 from PySide6.QtGui import QMovie, QPixmap, QImage, Qt
 from PySide6.QtMultimedia import QCameraDevice, QMediaDevices
@@ -25,6 +26,7 @@ input_size = 192
 
 class PreviewThread(QThread):
 	updateFrame = Signal(QImage)
+	updateFrameNpArray = Signal(np.ndarray)
 	ThreadActive = False
 	inputIndex = 0
 
@@ -39,12 +41,15 @@ class PreviewThread(QThread):
 			ret, frame = self.getFrame(frameSource)
 			if not ret:
 				continue
+
+			self.updateFrameNpArray.emit(frame) # <class 'numpy.ndarray'>
+
 			colorCorrectedFrame = cv2.cvtColor(self.usableFrame(frame), cv2.COLOR_BGR2RGB)
 			flippedFrame = self.flip(colorCorrectedFrame)
-			frameInQtFormat = QImage(flippedFrame.data, flippedFrame.shape[1], flippedFrame.shape[0],
-			                         QImage.Format_RGB888)
+
+			frameInQtFormat = QImage(flippedFrame.data, flippedFrame.shape[1], flippedFrame.shape[0], QImage.Format_RGB888)
 			finalFrame = frameInQtFormat.scaled(self.previewSize.width(), self.previewSize.height(), Qt.KeepAspectRatio)
-			self.updateFrame.emit(finalFrame)
+			self.updateFrame.emit(finalFrame) # <class 'PySide6.QtGui.QImage'>
 
 	def source(self):
 		if sys.platform == "win32":
@@ -86,7 +91,7 @@ class PreviewThread(QThread):
 		self.quit()
 
 
-def movenet(input_image):
+def movenet(input_image, interpreter):
 	# TF Lite format expects tensor type of uint8.
 	input_image = tf.cast(input_image, dtype=tf.uint8)
 	input_details = interpreter.get_input_details()
@@ -113,86 +118,37 @@ class movenetThread(QThread):
 	def __init__(self, parent, previewSize):
 		super().__init__(parent)
 		self.previewSize = previewSize
+		self.interpreter = tf.lite.Interpreter(model_path="model.tflite")
+		self.interpreter.allocate_tensors()
 
 	def run(self):
 		self.ThreadActive = True
 
-	def incomingFrame(self, frame):
+	def updateFrameSlot(self, frame):
 		self.movenet_frame = (self.movenet_frame + 1) % 10
 		if self.movenet_frame == 0:
 
-			# TODO PROCESS HERE
+			input_frame = tf.expand_dims(frame, axis=0)
+			input_frame = tf.image.resize_with_pad(input_frame, input_size, input_size)
 
-			self.updateFrame.emit(frame)
+			keypoints_with_scores = movenet(input_frame, self.interpreter)
+
+			display_image = tf.expand_dims(frame, axis=0)
+			display_image = tf.cast(tf.image.resize_with_pad(display_image, 1280, 1280), dtype=tf.int32)
+			output_overlay = draw_prediction_on_image(np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores)
+
+			colorCorrectedFrame = cv2.cvtColor(np_array(output_overlay), cv2.COLOR_BGR2RGB)
+
+			frameInQtFormat = QImage(colorCorrectedFrame.data, colorCorrectedFrame.shape[1], colorCorrectedFrame.shape[0],
+			                         QImage.Format_RGB888)
+			finalFrame = frameInQtFormat.scaled(self.previewSize.width(), self.previewSize.height(), Qt.KeepAspectRatio)
+
+			self.updateFrame.emit(finalFrame)
+
 
 	def stop(self):
 		self.ThreadActive = False
 		self.quit()
-
-def main():
-	if sys.platform == "win32":
-		capture = cv2.VideoCapture(1)
-	elif sys.platform == "linux":
-		capture = cv2.VideoCapture(0, CAP_V4L2)
-
-	capture.set(CAP_PROP_FPS, 30)
-	capture.set(CAP_PROP_FRAME_WIDTH, 1280)
-	capture.set(CAP_PROP_FRAME_HEIGHT, 720)
-	capture.set(CAP_PROP_FOURCC, 1196444237)
-	capture.read()
-
-	getInputProperties(capture)
-	cam = cameraOutput()
-
-	print('Size: ', width, 'x', height, '\nFPS: ', fps, '\nTotal Frames: ', frame_count, sep='')
-
-	# tf
-	interpreter = tf.lite.Interpreter(model_path="model.tflite")
-	interpreter.allocate_tensors()
-
-	# Main loop
-	try:
-		while True:
-			retVal, frame = capture.read()
-
-			if (cv2.waitKey(1) & 0xFF == ord('q')) or not retVal:
-				break
-
-			if cameraOut:
-				frame = cv2.cvtColor(np_array(frame), cv2.COLOR_RGB2BGR)  # this line corrects the color coding
-				cam.send(frame)
-			else:
-				frame = cv2.flip(frame, 1)
-
-				input_frame = tf.expand_dims(frame, axis=0)
-				input_frame = tf.image.resize_with_pad(input_frame, input_size, input_size)
-
-				keypoints_with_scores = movenet(input_frame)
-
-
-				display_image = tf.expand_dims(frame, axis=0)
-				display_image = tf.cast(tf.image.resize_with_pad(
-					display_image, 1280, 1280), dtype=tf.int32)
-				output_overlay = draw_prediction_on_image(
-					np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores)
-				cv2.imshow('frame', output_overlay)
-
-	except KeyboardInterrupt:
-		pass
-
-	# Exiting
-	cv2.destroyAllWindows()
-	capture.release()
-	if cameraOut:
-		showPlaceholder(cam)
-		cam.close()
-		if platform.system() == "Linux":
-			retVal = -1
-			while retVal != 0:
-				if retVal != -1:
-					time.sleep(1)
-				retVal = os.system("sudo modprobe -r v4l2loopback")
-
 
 def getInputProperties(capture):
 	global width, height, fps, frame_count
@@ -200,7 +156,6 @@ def getInputProperties(capture):
 	height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))  # float `height`
 	fps = int(capture.get(cv2.CAP_PROP_FPS))  # float `fps`
 	frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))  # float `frame count`
-
 
 def cameraOutput():
 	if cameraOut:
@@ -217,7 +172,6 @@ def cameraOutput():
 	else:
 		cv2.namedWindow("frame", cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
 
-
 def showPlaceholder(cam):
 	ph = cv2.imread("media/placeholder.png")
 	ph = cv2.cvtColor(ph, cv2.COLOR_RGB2BGR)
@@ -225,13 +179,12 @@ def showPlaceholder(cam):
 	for i in range(fps):
 		cam.send(ph)
 
-
 class MainWindow(QMainWindow):
 	previewSize = QSize(853, 480)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.resize(1706, 480)
+		self.resize(self.previewSize.width() * 2, self.previewSize.height())
 
 		self.centralWidget = QWidget()
 		self.layout = QGridLayout()
@@ -275,7 +228,7 @@ class MainWindow(QMainWindow):
 		self.movenetThread.start()
 		self.movenetThread.updateFrame.connect(self.updateMovenetFrameSlot)
 
-		self.previewThread.updateFrame.connect(self.movenetThread.incomingFrame)
+		self.previewThread.updateFrameNpArray.connect(self.movenetThread.updateFrameSlot)
 
 	def updateFrameSlot(self, image):
 		self.previewWidget.setPixmap(QPixmap.fromImage(image))
@@ -298,9 +251,6 @@ class MainWindow(QMainWindow):
 		loadingGIF = QMovie("media/loading.gif")
 		self.previewWidget.setMovie(loadingGIF)
 		loadingGIF.start()
-
-
-
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
