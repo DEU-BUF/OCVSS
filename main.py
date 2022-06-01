@@ -13,8 +13,8 @@ def vprint(*args, **kwargs):
 	print(*args, **kwargs)
 
 
-cameraOut = False
-screenCapture = False
+cameraOut = True
+screenCapture = True
 
 mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
 scrCapt = mss()  # Screen capturing utility

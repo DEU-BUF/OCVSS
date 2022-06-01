@@ -24,7 +24,7 @@ def main():
 	if sys.platform == "win32":
 		capture = cv2.VideoCapture(1)
 	elif sys.platform == "linux":
-		capture = cv2.VideoCapture("media/class_video2_720_30fps.mp4")
+		capture = cv2.VideoCapture(0, cv2.CAP_V4L2)
 
 	capture.set(CAP_PROP_FPS, 30)
 	capture.set(CAP_PROP_FRAME_WIDTH, 1280)

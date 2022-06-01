@@ -15,7 +15,7 @@ class MovenetWidget(Preview.PreviewWidget):
 	class Thread(Preview.PreviewWidget.Thread):
 		movenet_frame = -1
 
-		def __init__(self, parent, previewSize):
+		def __init__(self, parent, previewSize, outputCamera):
 			super().__init__(parent, previewSize)
 
 		def run(self):

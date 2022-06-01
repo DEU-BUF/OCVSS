@@ -17,7 +17,7 @@ class CameraWidget(Preview.PreviewWidget):
 	class Thread(Preview.PreviewWidget.Thread):
 		cameraFormats = []
 
-		def __init__(self, parent, previewSize):
+		def __init__(self, parent, previewSize, outputCamera):
 			setLogLevel(0)  # Disable OpenCV logs about gstreamer
 			super().__init__(parent, previewSize)
 

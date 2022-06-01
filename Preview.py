@@ -1,3 +1,4 @@
+import numpy
 from PySide6.QtGui import Qt, QImage, QPixmap, QMovie, QColor
 from PySide6.QtWidgets import QWidget, QLabel, QSizePolicy, QFrame, QGridLayout, QPushButton
 from PySide6.QtCore import QThread, Signal, QSize
@@ -9,7 +10,7 @@ from abc import abstractmethod
 class PreviewWidget(QWidget):
 	previewSize = QSize(640, 360)
 
-	def __init__(self, parent=None):
+	def __init__(self, parent=None, outputCamera=None):
 		super().__init__(parent)
 
 		self.layout = QGridLayout()
@@ -29,7 +30,7 @@ class PreviewWidget(QWidget):
 		self.loading()
 		self.layout.addWidget(self.previewView, 0, 0, 1, 1)
 
-		self.previewThread = self.Thread(self, self.previewView)
+		self.previewThread = self.Thread(self, self.previewView, outputCamera)
 		self.previewThread.start()
 		self.previewThread.updateFrame.connect(self.updateFrameSlot)
 
@@ -66,20 +67,24 @@ class PreviewWidget(QWidget):
 
 	class Thread(QThread):
 		updateFrame = Signal(QImage)
+		updateFrameNP = Signal(numpy.ndarray)
 		ThreadActive = False
 		inputIndex = 0
 
-		def __init__(self, parent, previewSize):
+		def __init__(self, parent, previewSize, outputCamera=None):
 			super().__init__(parent)
 			self.previewSize = previewSize
+			self.cam = outputCamera
 
 		def run(self):
+
 			self.ThreadActive = True
 			frameSource = self.source()
 			while self.ThreadActive:
 				ret, frame = self.getFrame(frameSource)
 				if not ret:
 					continue
+				self.updateFrameNP.emit(frame)
 				colorCorrectedFrame = cvtColor(self.usableFrame(frame), COLOR_BGR2RGB)
 				flippedFrame = self.flip(colorCorrectedFrame)
 				frameInQtFormat = QImage(flippedFrame.data, flippedFrame.shape[1], flippedFrame.shape[0], QImage.Format_RGB888)

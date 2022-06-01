@@ -25,8 +25,8 @@ input_size = 192
 
 
 class PreviewThread(QThread):
-	updateFrame = Signal(QImage)
-	updateFrameNpArray = Signal(np.ndarray)
+	kameradanFrameGeldiGitEkranaBas = Signal(QImage)
+	kameradanFrameGeldigitMovenetIsle = Signal(np.ndarray)
 	ThreadActive = False
 	inputIndex = 0
 
@@ -42,14 +42,14 @@ class PreviewThread(QThread):
 			if not ret:
 				continue
 
-			self.updateFrameNpArray.emit(frame) # <class 'numpy.ndarray'>
+			self.kameradanFrameGeldigitMovenetIsle.emit(frame) # <class 'numpy.ndarray'>
 
 			colorCorrectedFrame = cv2.cvtColor(self.usableFrame(frame), cv2.COLOR_BGR2RGB)
 			flippedFrame = self.flip(colorCorrectedFrame)
 
 			frameInQtFormat = QImage(flippedFrame.data, flippedFrame.shape[1], flippedFrame.shape[0], QImage.Format_RGB888)
 			finalFrame = frameInQtFormat.scaled(self.previewSize.width(), self.previewSize.height(), Qt.KeepAspectRatio)
-			self.updateFrame.emit(finalFrame) # <class 'PySide6.QtGui.QImage'>
+			self.kameradanFrameGeldiGitEkranaBas.emit(finalFrame) # <class 'PySide6.QtGui.QImage'>
 
 	def source(self):
 		if sys.platform == "win32":
@@ -110,7 +110,7 @@ def movenet(input_image, interpreter):
 
 
 class movenetThread(QThread):
-	updateFrame = Signal(QImage)
+	movenettenFrameGeldi = Signal(QImage)
 	ThreadActive = False
 	inputIndex = 0
 	movenet_frame = -1
@@ -124,7 +124,7 @@ class movenetThread(QThread):
 	def run(self):
 		self.ThreadActive = True
 
-	def updateFrameSlot(self, frame):
+	def movenetFrameiIsleSlot(self, frame):
 		self.movenet_frame = (self.movenet_frame + 1) % 10
 		if self.movenet_frame == 0:
 
@@ -143,7 +143,7 @@ class movenetThread(QThread):
 			                         QImage.Format_RGB888)
 			finalFrame = frameInQtFormat.scaled(self.previewSize.width(), self.previewSize.height(), Qt.KeepAspectRatio)
 
-			self.updateFrame.emit(finalFrame)
+			self.movenettenFrameGeldi.emit(finalFrame)
 
 
 	def stop(self):
@@ -207,7 +207,7 @@ class MainWindow(QMainWindow):
 
 		self.previewThread = PreviewThread(self, self.previewWidget)
 		self.previewThread.start()
-		self.previewThread.updateFrame.connect(self.updateFrameSlot)
+		self.previewThread.kameradanFrameGeldiGitEkranaBas.connect(self.SoldakiFrameeResmiBasSlot)
 
 
 		self.movenetWidget = QLabel(self)
@@ -226,14 +226,14 @@ class MainWindow(QMainWindow):
 
 		self.movenetThread = movenetThread(self, self.movenetWidget)
 		self.movenetThread.start()
-		self.movenetThread.updateFrame.connect(self.updateMovenetFrameSlot)
+		self.movenetThread.movenettenFrameGeldi.connect(self.SagdakiFrameeResmiBasSlot)
 
-		self.previewThread.updateFrameNpArray.connect(self.movenetThread.updateFrameSlot)
+		self.previewThread.kameradanFrameGeldigitMovenetIsle.connect(self.movenetThread.movenetFrameiIsleSlot)
 
-	def updateFrameSlot(self, image):
+	def SoldakiFrameeResmiBasSlot(self, image):
 		self.previewWidget.setPixmap(QPixmap.fromImage(image))
 
-	def updateMovenetFrameSlot(self, image):
+	def SagdakiFrameeResmiBasSlot(self, image):
 		self.movenetWidget.setPixmap(QPixmap.fromImage(image))
 
 	def startPreviewFeed(self):
