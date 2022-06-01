@@ -13,7 +13,7 @@ import VideoInput
 import Screen
 
 verbose = True
-CameraInput = True
+CameraInput = False
 
 
 class MainWindow(QMainWindow):
@@ -68,7 +68,6 @@ class MainWindow(QMainWindow):
 		QMetaObject.connectSlotsByName(self)
 
 	def switchOutputOnClick(self):
-		print("ASDASDASDASDASDASDASD")
 		if self.isOutputCamera:
 			if not self.firstTimeSwitch:
 				self.screenWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
