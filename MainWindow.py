@@ -25,10 +25,10 @@ class MainWindow(QMainWindow):
 		self.gridLayout = QGridLayout(self.centralWidget)
 
 		self.stopBtn = QPushButton(self.centralWidget)
-		self.gridLayout.addWidget(self.stopBtn, 2, 0, 1, 1)
+		self.gridLayout.addWidget(self.stopBtn, 3, 0, 1, 1)
 
 		self.startBtn = QPushButton(self.centralWidget)
-		self.gridLayout.addWidget(self.startBtn, 2, 1, 1, 1)
+		self.gridLayout.addWidget(self.startBtn, 3, 1, 1, 1)
 
 		# Preview widgets
 		self.screenWidget = Screen.ScreenWidget(self.centralWidget)
@@ -47,21 +47,49 @@ class MainWindow(QMainWindow):
 			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
 			self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot)
-			self.cameraWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
-			self.cameraWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
 
 		else:
 			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.videoInputWidget, 0, 0, 1, 1)
 			self.videoInputWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot)
-			self.videoInputWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
-			self.videoInputWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
+
+
+		self.switchButton = QPushButton("SWITCH OUTPUT")
+		self.gridLayout.addWidget(self.switchButton, 2, 0, 1, 2)
+		self.isOutputCamera = True
+		self.switchOutputOnClick()
 
 		self.setCentralWidget(self.centralWidget)
 
 		self.retranslateUi(self)
 
 		QMetaObject.connectSlotsByName(self)
+
+	def switchOutputOnClick(self):
+		if self.isOutputCamera:
+			self.screenWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
+			self.screenWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+
+			if CameraInput:
+				self.cameraWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
+				self.cameraWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
+			else:
+				self.videoInputWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
+				self.videoInputWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
+		else:
+			if CameraInput:
+				self.cameraWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
+				self.cameraWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+			else:
+				self.videoInputWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
+				self.videoInputWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+
+			self.screenWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
+			self.screenWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
+
+		self.isOutputCamera = not self.isOutputCamera
+
+
 
 	def retranslateUi(self, Window):
 		Window.setWindowTitle(QCoreApplication.translate("MainWindow", "OCVSS", None))
