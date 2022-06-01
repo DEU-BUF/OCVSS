@@ -57,7 +57,9 @@ class MainWindow(QMainWindow):
 		self.switchButton = QPushButton("SWITCH OUTPUT")
 		self.gridLayout.addWidget(self.switchButton, 2, 0, 1, 2)
 		self.isOutputCamera = True
+		self.firstTimeSwitch = True
 		self.switchOutputOnClick()
+		self.switchButton.clicked.connect(self.switchOutputOnClick)
 
 		self.setCentralWidget(self.centralWidget)
 
@@ -66,9 +68,13 @@ class MainWindow(QMainWindow):
 		QMetaObject.connectSlotsByName(self)
 
 	def switchOutputOnClick(self):
+		print("ASDASDASDASDASDASDASD")
 		if self.isOutputCamera:
-			self.screenWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
-			self.screenWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+			if not self.firstTimeSwitch:
+				self.screenWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
+				self.screenWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+			else:
+				self.firstTimeSwitch = False
 
 			if CameraInput:
 				self.cameraWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
@@ -77,12 +83,15 @@ class MainWindow(QMainWindow):
 				self.videoInputWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
 				self.videoInputWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
 		else:
-			if CameraInput:
-				self.cameraWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
-				self.cameraWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+			if not self.firstTimeSwitch:
+				if CameraInput:
+					self.cameraWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
+					self.cameraWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+				else:
+					self.videoInputWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
+					self.videoInputWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
 			else:
-				self.videoInputWidget.previewThread.updateFrame.disconnect(self.outputWidget.previewThread.updateFrameSlot)
-				self.videoInputWidget.previewThread.updateFrameNP.disconnect(self.outputWidget.previewThread.updateFrameNPSlot)
+				self.firstTimeSwitch = False
 
 			self.screenWidget.previewThread.updateFrame.connect(self.outputWidget.previewThread.updateFrameSlot)
 			self.screenWidget.previewThread.updateFrameNP.connect(self.outputWidget.previewThread.updateFrameNPSlot)
