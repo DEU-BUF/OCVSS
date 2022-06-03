@@ -21,7 +21,7 @@ class MovenetWidget(Preview.PreviewWidget):
 		self.changeBtn.hide()
 
 	def updateFrameSlot(self, image):
-		#TODO
+		#TODO Make proper scaling
 		self.previewView.setPixmap(QPixmap.fromImage(image.copy(0, 75, 347, 196).scaled(640, 360)))
 
 	class Thread(Preview.PreviewWidget.Thread):
@@ -30,6 +30,7 @@ class MovenetWidget(Preview.PreviewWidget):
 		movenet_frame = -1
 		# tf
 		input_size = 192
+		threshold = 0.22
 
 		def __init__(self, parent, previewSize, outputCamera):
 			super().__init__(parent, previewSize)
@@ -54,7 +55,7 @@ class MovenetWidget(Preview.PreviewWidget):
 				#TODO make this 720 to make borders cease to exist
 				display_image = tf.cast(tf.image.resize_with_pad(display_image, 1280, 1280), dtype=tf.int32)
 				output_overlay = draw_prediction_on_image(np.squeeze(display_image.numpy(), axis=0),
-				                                          keypoints_with_scores)
+				                                          keypoints_with_scores, threshold=self.threshold)
 
 				colorCorrectedFrame = cvtColor(np_array(output_overlay), COLOR_BGR2RGB)
 
@@ -86,5 +87,14 @@ class MovenetWidget(Preview.PreviewWidget):
 			# f.write("\n")
 			# f.write(str(output_details[0]))
 			# f.close()
+			_, height, width, channel = input_image.shape
+			left_wrist = keypoints_with_scores[0, 0, KEYPOINT_DICT['left_wrist'], :] * [height, width, 1]
+			right_wrist = keypoints_with_scores[0, 0, KEYPOINT_DICT['right_wrist'], :] * [height, width, 1]
+			# nose = keypoints_with_scores[0, 0, KEYPOINT_DICT['nose'], :] * [height, width, 1]
+			if (left_wrist[2] > self.threshold):
+				print(left_wrist[1] > width / 2, 'Confidence:', left_wrist[2])
+			if (right_wrist[2] > self.threshold):
+				print(right_wrist[1] > width / 2, 'Confidence:', right_wrist[2])
+
 			return keypoints_with_scores
 

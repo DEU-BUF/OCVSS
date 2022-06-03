@@ -48,7 +48,7 @@ KEYPOINT_EDGE_INDS_TO_COLOR = {
 def _keypoints_and_edges_for_display(keypoints_with_scores,
                                      height,
                                      width,
-                                     keypoint_threshold=0.15):
+                                     keypoint_threshold):
 	"""Returns high confidence keypoints and edges for visualization.
 
 	Args:
@@ -114,7 +114,7 @@ def _keypoints_and_edges_for_display(keypoints_with_scores,
 
 def draw_prediction_on_image(
 		image, keypoints_with_scores, crop_region=None, close_figure=False,
-		output_image_height=None):
+		output_image_height=None, threshold = 0.22):
 	"""Draws the keypoint predictions on image.
 
 	Args:
@@ -151,7 +151,7 @@ def draw_prediction_on_image(
 
 	(keypoint_locs, keypoint_edges,
 	 edge_colors) = _keypoints_and_edges_for_display(
-		keypoints_with_scores, height, width)
+		keypoints_with_scores, height, width, threshold)
 
 	line_segments.set_segments(keypoint_edges)
 	line_segments.set_color(edge_colors)
