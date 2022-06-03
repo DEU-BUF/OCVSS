@@ -13,7 +13,7 @@ import VideoInput
 import Screen
 
 verbose = True
-CameraInput = False
+CameraInput = True
 
 
 class MainWindow(QMainWindow):
@@ -46,7 +46,8 @@ class MainWindow(QMainWindow):
 		if CameraInput:
 			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
-			self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot)
+			#self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot) # original
+			self.cameraWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.movenetFrameIsleSlot) # movenet version
 
 		else:
 			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)

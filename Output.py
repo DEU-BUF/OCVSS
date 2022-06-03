@@ -26,11 +26,6 @@ class OutputWidget(Preview.PreviewWidget):
 
 		#TODO Make the resolution selectible
 		self.cam = pyvirtualcam.Camera(1280, 720, 30, device=device)
-		testImage = cv2.imread("media/placeholder.png")
-		testImage = cv2.resize(testImage, (1280, 720))
-		# for i in range(10000):
-		# 	self.cam.send(testImage)
-		print("ASDASDASDDFJASDKLF SDLFKLSDHFKLASD:KFJK:ASDJFK:DSAKFJHSDKA:F")
 		super().__init__(parent, self.cam)
 		self.changeBtn.hide()
 
@@ -67,8 +62,6 @@ class OutputWidget(Preview.PreviewWidget):
 
 		def updateFrameNPSlot(self, frame):
 			frame = np_array(frame)
-			print(type(frame))
-			print(frame.shape)
 			frame = cv2.resize(frame, (1280, 720))
 			self.cam.send(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)) # this line corrects the color coding
 

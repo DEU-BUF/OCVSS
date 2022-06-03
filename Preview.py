@@ -77,7 +77,6 @@ class PreviewWidget(QWidget):
 			self.cam = outputCamera
 
 		def run(self):
-
 			self.ThreadActive = True
 			frameSource = self.source()
 			while self.ThreadActive:
