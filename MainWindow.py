@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
 
 		self.movenetWidget = MovenetWidget.MovenetWidget(self.centralWidget)
 		self.gridLayout.addWidget(self.movenetWidget, 1, 0, 1, 1)
+		self.movenetWidget.previewThread.changeOutputSource.connect(self.switchOutputOnClick)
 
 		self.outputWidget = Output.OutputWidget(self.centralWidget)
 		self.gridLayout.addWidget(self.outputWidget, 1, 1, 1, 1)
@@ -46,13 +47,13 @@ class MainWindow(QMainWindow):
 		if CameraInput:
 			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
-			#self.cameraWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot) # original
 			self.cameraWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.movenetFrameIsleSlot) # movenet version
 
 		else:
 			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.videoInputWidget, 0, 0, 1, 1)
-			self.videoInputWidget.previewThread.updateFrame.connect(self.movenetWidget.previewThread.updateFrameSlot)
+			self.videoInputWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.movenetFrameIsleSlot)  # movenet version
+
 
 
 		self.switchButton = QPushButton("SWITCH OUTPUT")
@@ -68,6 +69,7 @@ class MainWindow(QMainWindow):
 
 		QMetaObject.connectSlotsByName(self)
 
+	#TODO Make this non-switch
 	def switchOutputOnClick(self):
 		if self.isOutputCamera:
 			if not self.firstTimeSwitch:

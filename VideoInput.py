@@ -16,7 +16,7 @@ class VideoInputWidget(Preview.PreviewWidget):
 			super().__init__(parent, previewSize)
 
 		def source(self):
-			return VideoCapture("media/sample_video.mp4")
+			return VideoCapture("media/class_video1.mp4")
 
 		def getFrame(self, source):
 			return source.read()
