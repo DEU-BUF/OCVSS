@@ -63,7 +63,10 @@ class OutputWidget(Preview.PreviewWidget):
 		def updateFrameNPSlot(self, frame):
 			frame = np_array(frame)
 			frame = cv2.resize(frame, (1280, 720))
-			self.cam.send(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)) # this line corrects the color coding
+			frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+			# print(type(frame))
+			# print(frame.shape)
+			self.cam.send(frame) # this line corrects the color coding
 
 		def updateFrameSlot(self, frame):
 			self.updateFrame.emit(frame)

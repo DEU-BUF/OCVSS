@@ -14,7 +14,7 @@ def vprint(*args, **kwargs):
 
 
 cameraOut = True
-screenCapture = True
+screenCapture = False
 
 mon = {'left': 0, 'top': 0, 'width': 1920, 'height': 1080}
 scrCapt = mss()  # Screen capturing utility
@@ -46,6 +46,8 @@ def main():
 
 			if cameraOut:
 				frame = cv2.cvtColor(np_array(frame), cv2.COLOR_RGB2BGR)  # this line corrects the color coding
+				print(type(frame))
+				print(frame.shape)
 				cam.send(frame)
 			else:
 				cv2.imshow('frame', np_array(frame))
@@ -98,7 +100,7 @@ def cameraOutput():
 
 
 def showPlaceholder(cam):
-	ph = cv2.imread("media/placeholder.png")
+	ph = cv2.imread("../media/placeholder.png")
 	ph = cv2.cvtColor(ph, cv2.COLOR_RGB2BGR)
 	ph = cv2.resize(ph, (width, height))
 	for i in range(fps):

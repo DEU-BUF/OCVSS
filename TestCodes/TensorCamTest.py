@@ -38,7 +38,7 @@ def main():
 	print('Size: ', width, 'x', height, '\nFPS: ', fps, '\nTotal Frames: ', frame_count, sep='')
 
 	# tf
-	interpreter = tf.lite.Interpreter(model_path="model.tflite")
+	interpreter = tf.lite.Interpreter(model_path="../model.tflite")
 	interpreter.allocate_tensors()
 
 	def movenet(input_image):
@@ -131,7 +131,7 @@ def cameraOutput():
 
 
 def showPlaceholder(cam):
-	ph = cv2.imread("media/placeholder.png")
+	ph = cv2.imread("../media/placeholder.png")
 	ph = cv2.cvtColor(ph, cv2.COLOR_RGB2BGR)
 	ph = cv2.resize(ph, (width, height))
 	for i in range(fps):

@@ -37,7 +37,7 @@ def main():
 		print(out.returncode)
 
 		# Initialize the TFLite interpreter
-		interpreter = tf.lite.Interpreter(model_path="model.tflite")
+		interpreter = tf.lite.Interpreter(model_path="../model.tflite")
 		interpreter.allocate_tensors()
 
 		def movenet(input_image):

@@ -118,7 +118,7 @@ class movenetThread(QThread):
 	def __init__(self, parent, previewSize):
 		super().__init__(parent)
 		self.previewSize = previewSize
-		self.interpreter = tf.lite.Interpreter(model_path="model.tflite")
+		self.interpreter = tf.lite.Interpreter(model_path="../model.tflite")
 		self.interpreter.allocate_tensors()
 
 	def run(self):
@@ -173,7 +173,7 @@ def cameraOutput():
 		cv2.namedWindow("frame", cv2.WINDOW_GUI_NORMAL | cv2.WINDOW_AUTOSIZE)
 
 def showPlaceholder(cam):
-	ph = cv2.imread("media/placeholder.png")
+	ph = cv2.imread("../media/placeholder.png")
 	ph = cv2.cvtColor(ph, cv2.COLOR_RGB2BGR)
 	ph = cv2.resize(ph, (width, height))
 	for i in range(fps):
@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
 		self.movenetThread.wait()
 
 	def loading(self):
-		loadingGIF = QMovie("media/loading.gif")
+		loadingGIF = QMovie("../media/loading.gif")
 		self.previewWidget.setMovie(loadingGIF)
 		loadingGIF.start()
 
