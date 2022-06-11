@@ -15,47 +15,25 @@ import Preview
 class OutputWidget(Preview.PreviewWidget):
 
 	def __init__(self, parent=None):
-		if platform.system() == "Linux":
-			os.system("sudo modprobe v4l2loopback devices=1 video_nr=4 card_label=\"OCVSS\" exclusive_caps=1")
-			device = "/dev/video4"
-			time.sleep(0.1)
-		elif platform.system() == "Darwin":
-			device = "unknown"  # for some reason Mac is named Darwin
-		else:
-			device = "OBS Virtual Camera"
-
-		#TODO Make the resolution selectible
-		self.cam = pyvirtualcam.Camera(1280, 720, 30, device=device)
-		super().__init__(parent, self.cam)
+		super().__init__(parent)
 		self.changeBtn.hide()
-
-	def createThread(self):
-		return self.Thread(self, self.previewSize, outputCamera)
-
-	def showPlaceholder(self):
-		ph = cv2.imread("media/placeholder.png")
-		ph = cv2.cvtColor(ph, cv2.COLOR_RGB2BGR)
-		ph = cv2.resize(ph, (1280, 720))
-		for i in range(30):
-			self.cam.send(ph)
-
-	def stopPreviewFeed(self):
-		self.showPlaceholder()
-		self.cam.close()
-		if platform.system() == "Linux":
-			retVal = -1
-			while retVal != 0:
-				if retVal != -1:
-					time.sleep(1)
-				retVal = os.system("sudo modprobe -r v4l2loopback")
-		super().stopPreviewFeed()
 
 	class Thread(Preview.PreviewWidget.Thread):
 
-		def __init__(self, parent, previewSize, outputCamera):
-			super().__init__(parent, previewSize, outputCamera)
+		def __init__(self, parent, previewSize):
+			super().__init__(parent, previewSize)
 			#TODO outputcamera gereksiz galiba, windowsta self.cam ile bu alttaki satır olmadan çalışıyor
-			self.cam = outputCamera
+			if platform.system() == "Linux":
+				os.system("sudo modprobe v4l2loopback devices=1 video_nr=4 card_label=\"OCVSS\" exclusive_caps=1")
+				device = "/dev/video4"
+				time.sleep(0.1)
+			elif platform.system() == "Darwin":
+				device = "unknown"  # for some reason Mac is named Darwin
+			else:
+				device = "OBS Virtual Camera"
+
+			# TODO Make the resolution selectible
+			self.cam = pyvirtualcam.Camera(1280, 720, 30, device=device)
 
 		def run(self):
 			self.ThreadActive = True
@@ -70,3 +48,22 @@ class OutputWidget(Preview.PreviewWidget):
 
 		def updateFrameSlot(self, frame):
 			self.updateFrame.emit(frame)
+
+		def showPlaceholder(self):
+			ph = cv2.imread("media/placeholder.png")
+			ph = cv2.cvtColor(ph, cv2.COLOR_RGB2BGR)
+			ph = cv2.resize(ph, (1280, 720))
+			for i in range(30):
+				self.cam.send(ph)
+
+		def stop(self):
+			self.showPlaceholder()
+			self.cam.close()
+			if platform.system() == "Linux":
+				retVal = -1
+				while retVal != 0:
+					if retVal != -1:
+						time.sleep(1)
+					retVal = os.system("sudo modprobe -r v4l2loopback")
+			super().stop()
+

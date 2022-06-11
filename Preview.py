@@ -10,7 +10,7 @@ from abc import abstractmethod
 class PreviewWidget(QWidget):
 	previewSize = QSize(640, 360)
 
-	def __init__(self, parent=None, outputCamera=None):
+	def __init__(self, parent=None):
 		super().__init__(parent)
 
 		self.layout = QGridLayout()
@@ -30,7 +30,7 @@ class PreviewWidget(QWidget):
 		self.loading()
 		self.layout.addWidget(self.previewView, 0, 0, 1, 1)
 
-		self.previewThread = self.Thread(self, self.previewView, outputCamera)
+		self.previewThread = self.Thread(self, self.previewView)
 		self.previewThread.start()
 		self.previewThread.updateFrame.connect(self.updateFrameSlot)
 
@@ -71,10 +71,9 @@ class PreviewWidget(QWidget):
 		ThreadActive = False
 		inputIndex = 0
 
-		def __init__(self, parent, previewSize, outputCamera=None):
+		def __init__(self, parent, previewSize):
 			super().__init__(parent)
 			self.previewSize = previewSize
-			self.cam = outputCamera
 
 		def run(self):
 			self.ThreadActive = True

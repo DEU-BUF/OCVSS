@@ -12,7 +12,7 @@ class VideoInputWidget(Preview.PreviewWidget):
 
 	class Thread(Preview.PreviewWidget.Thread):
 
-		def __init__(self, parent, previewSize, outputCamera):
+		def __init__(self, parent, previewSize):
 			super().__init__(parent, previewSize)
 
 		def source(self):

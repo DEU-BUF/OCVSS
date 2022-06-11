@@ -34,7 +34,7 @@ class MovenetWidget(Preview.PreviewWidget):
 		input_size = 192
 		threshold = 0.22
 
-		def __init__(self, parent, previewSize, outputCamera):
+		def __init__(self, parent, previewSize):
 			super().__init__(parent, previewSize)
 			self.previewSize = previewSize
 			self.interpreter = tf.lite.Interpreter(model_path="model.tflite")
