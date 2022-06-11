@@ -34,6 +34,7 @@ class OutputWidget(Preview.PreviewWidget):
 
 			# TODO Make the resolution selectible
 			self.cam = pyvirtualcam.Camera(1280, 720, 30, device=device)
+			self.showPlaceholder()
 
 		def run(self):
 			self.ThreadActive = True
