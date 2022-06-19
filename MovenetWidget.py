@@ -10,14 +10,12 @@ import tensorflow as tf
 from TensorHelper import *
 
 import Preview
-
-import cv2
+import Global
 
 class MovenetWidget(Preview.PreviewWidget):
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		self.previewThread.movenettenFrameGeldi.connect(self.updateFrameSlot)
 		self.changeBtn.hide()
 
 	def updateFrameSlot(self, image):
@@ -25,9 +23,7 @@ class MovenetWidget(Preview.PreviewWidget):
 		self.previewView.setPixmap(QPixmap.fromImage(image.copy(0, 75, 347, 196).scaled(640, 360)))
 
 	class Thread(Preview.PreviewWidget.Thread):
-		movenettenFrameGeldi = Signal(QImage)
 		changeOutputSource = Signal()
-		isHandInWhiteBoard = True
 		inputIndex = 0
 		movenet_frame = -1
 		# tf
@@ -43,8 +39,7 @@ class MovenetWidget(Preview.PreviewWidget):
 		def run(self):
 			self.ThreadActive = True
 
-		#def updateFrameSlot(self, frame): #real name is this
-		def movenetFrameIsleSlot(self, frame):
+		def updateFrameSlot(self, frame):
 			self.movenet_frame = (self.movenet_frame + 1) % 30
 			if self.movenet_frame == 0:
 				# TODO PROCESS IS HERE
@@ -71,8 +66,7 @@ class MovenetWidget(Preview.PreviewWidget):
 
 				finalFrame = finalFrame.copy(3, 4, 347, 347)  # cropping white borders
 
-				# self.updateFrame.emit(frame) #real frame sending signal will be this
-				self.movenettenFrameGeldi.emit(finalFrame)
+				self.updateFrame.emit(finalFrame)
 
 		def movenet(self, input_image, interpreter):
 			# TF Lite format expects tensor type of uint8.
@@ -84,33 +78,29 @@ class MovenetWidget(Preview.PreviewWidget):
 			interpreter.invoke()
 			# Get the model prediction.
 			keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
-			# f = open("keypoints.txt", "w")
-			# f.write(str(input_details[0]))
-			# f.write("\n")
-			# f.write(str(output_details[0]))
-			# f.close()
+
 			_, height, width, channel = input_image.shape
 			left_wrist = keypoints_with_scores[0, 0, KEYPOINT_DICT['left_wrist'], :] * [height, width, 1]
 			right_wrist = keypoints_with_scores[0, 0, KEYPOINT_DICT['right_wrist'], :] * [height, width, 1]
 			# nose = keypoints_with_scores[0, 0, KEYPOINT_DICT['nose'], :] * [height, width, 1]
 
-			if (left_wrist[2] > self.threshold and not (right_wrist[2] > self.threshold and right_wrist[0] < left_wrist[0])):
+			if left_wrist[2] > self.threshold and not (right_wrist[2] > self.threshold and right_wrist[0] < left_wrist[0]):
 				print(left_wrist[1] > width / 2, 'Confidence:', left_wrist[2])
-				if(left_wrist[1] > width / 2 and not self.isHandInWhiteBoard):
+				if left_wrist[1] > width / 2 and not Global.isHandInWhiteBoard:
 					self.changeOutputSource.emit()
-					self.isHandInWhiteBoard = not self.isHandInWhiteBoard
-				elif(left_wrist[1] < width / 2 and self.isHandInWhiteBoard):
+					Global.isHandInWhiteBoard = not Global.isHandInWhiteBoard
+				elif left_wrist[1] < width / 2 and Global.isHandInWhiteBoard:
 					self.changeOutputSource.emit()
-					self.isHandInWhiteBoard = not self.isHandInWhiteBoard
+					Global.isHandInWhiteBoard = not Global.isHandInWhiteBoard
 
-			if (right_wrist[2] > self.threshold and not (left_wrist[2] > self.threshold and left_wrist[0] < right_wrist[0])):
+			if right_wrist[2] > self.threshold and not (left_wrist[2] > self.threshold and left_wrist[0] < right_wrist[0]):
 				print(right_wrist[1] > width / 2, 'Confidence:', right_wrist[2])
-				if (right_wrist[1] > width / 2 and not self.isHandInWhiteBoard):
+				if right_wrist[1] > width / 2 and not Global.isHandInWhiteBoard:
 					self.changeOutputSource.emit()
-					self.isHandInWhiteBoard = not self.isHandInWhiteBoard
-				elif (right_wrist[1] < width / 2 and self.isHandInWhiteBoard):
+					Global.isHandInWhiteBoard = not Global.isHandInWhiteBoard
+				elif right_wrist[1] < width / 2 and Global.isHandInWhiteBoard:
 					self.changeOutputSource.emit()
-					self.isHandInWhiteBoard = not self.isHandInWhiteBoard
+					Global.isHandInWhiteBoard = not Global.isHandInWhiteBoard
 
 			return keypoints_with_scores
 

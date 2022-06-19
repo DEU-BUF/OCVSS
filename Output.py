@@ -10,6 +10,7 @@ from cv2 import VideoCapture, flip, setLogLevel, VideoWriter_fourcc
 from cv2 import CAP_V4L2, CAP_DSHOW, CAP_PROP_FPS, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FOURCC, CAP_PROP_BACKEND
 from PySide6.QtMultimedia import QMediaDevices, QVideoFrameFormat
 import Preview
+import Global
 
 
 class OutputWidget(Preview.PreviewWidget):
@@ -17,6 +18,11 @@ class OutputWidget(Preview.PreviewWidget):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.changeBtn.hide()
+
+	def cropPreview(self, image):
+		if Global.isHandInWhiteBoard:
+			image = image.copy(0, 0, 320, 180).scaled(640, 360)  # cv2.resize(frame[:360, 640:], (1280, 720))
+		return image
 
 	class Thread(Preview.PreviewWidget.Thread):
 
@@ -45,7 +51,9 @@ class OutputWidget(Preview.PreviewWidget):
 			frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 			# print(type(frame))
 			# print(frame.shape)
-			self.cam.send(frame) # this line corrects the color coding
+			if Global.isHandInWhiteBoard:
+				frame = cv2.resize(frame[:360, 640:], (1280, 720))
+			self.cam.send(frame)
 
 		def updateFrameSlot(self, frame):
 			self.updateFrame.emit(frame)

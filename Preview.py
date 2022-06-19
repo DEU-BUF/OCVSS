@@ -39,8 +39,11 @@ class PreviewWidget(QWidget):
 		self.layout.addWidget(self.changeBtn, 1, 0, 1, 1)
 
 
+	def cropPreview(self, image):
+		return image
+
 	def updateFrameSlot(self, image):
-		self.previewView.setPixmap(QPixmap.fromImage(image))
+		self.previewView.setPixmap(self.cropPreview(QPixmap.fromImage(image)))
 
 	def startPreviewFeed(self):
 		self.previewThread.start()

@@ -42,17 +42,20 @@ class MainWindow(QMainWindow):
 		self.outputWidget = Output.OutputWidget(self.centralWidget)
 		self.gridLayout.addWidget(self.outputWidget, 1, 1, 1, 1)
 
+		# self.startBtn.clicked.connect(self.outputWidget.previewThread.run)
+		# self.stopBtn.clicked.connect(self.outputWidget.previewThread.stop)
+
 
 		# Create camera and screen widgets and add to the layout
 		if CameraInput:
 			self.cameraWidget = Camera.CameraWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.cameraWidget, 0, 0, 1, 1)
-			self.cameraWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.movenetFrameIsleSlot) # movenet version
+			self.cameraWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.updateFrameSlot) # movenet version
 
 		else:
 			self.videoInputWidget = VideoInput.VideoInputWidget(self.centralWidget)
 			self.gridLayout.addWidget(self.videoInputWidget, 0, 0, 1, 1)
-			self.videoInputWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.movenetFrameIsleSlot)  # movenet version
+			self.videoInputWidget.previewThread.updateFrameNP.connect(self.movenetWidget.previewThread.udpateFrameSlot)  # movenet version
 
 
 

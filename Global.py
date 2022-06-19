@@ -1,0 +1,2 @@
+global isHandInWhiteBoard
+isHandInWhiteBoard = True
