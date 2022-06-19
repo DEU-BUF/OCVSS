@@ -8,4 +8,4 @@ Bachelor's Project by
 - Uygar Uyğun
 - Ferhat Doğan
 
-for Computer Engineering in Dokuz Eylül University (DEÜ)
+for Computer Engineering in Dokuz Eylül University (DEÜ).
